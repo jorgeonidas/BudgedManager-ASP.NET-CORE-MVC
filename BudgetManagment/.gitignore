@@ -1,0 +1,64 @@
+# Visual Studio temporary files, build results, and other generated files
+.vs/
+bin/
+obj/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.pdb
+*.dll.config
+*.cache
+UpgradeLog.XML
+_UpgradeReport_Files/
+
+# NuGet packages
+packages/
+!/packages/*/lib/*.dll
+!/packages/*/lib/*/*.dll
+
+# Resharper and other IDE-specific files
+_ReSharper.*/
+*.ReSharper.*
+*.resharper
+
+# Test results
+TestResults/
+
+# Web publish logs
+*.Publish.xml
+
+# User-specific files (MonoDevelop/Xamarin Studio)
+*.userprefs
+
+# Mono auto generated files
+mono_crash.*
+
+# Source control files
+*.scc
+*.vssscc
+*.vspscc
+
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+
+# NCrunch
+*.ncrunchsolution
+*.ncrunchproject
+_NCrunch_*/
+
+# Visual Studio Profiler
+*.vsp
+*.vspx
+
+# StyleCop
+StyleCop.Cache
+
+# Local application settings (if present and containing sensitive data)
+# Consider using User Secrets or Azure Key Vault for sensitive data in production
+# appsettings.Development.json
+# appsettings.Production.json
+# appsettings.json (if it contains sensitive data not meant for source control)
