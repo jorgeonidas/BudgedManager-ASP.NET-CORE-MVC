@@ -1,24 +1,20 @@
 ﻿using BudgetManagment.Models;
-using Dapper;
+using BudgetManagment.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 
 namespace BudgetManagment.Controllers
 {
     public class AccountTypesController : Controller
     {
-        private readonly string  _connectionString;
-        public AccountTypesController(IConfiguration configuration)
+        private readonly IRepositoryAccountTypes _repositoryAccountTypes;
+
+        public AccountTypesController(IRepositoryAccountTypes repositoryAccountTypes)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            this._repositoryAccountTypes = repositoryAccountTypes;
         }
+
         public IActionResult Create()
         {
-            //testing db connection
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                var query = connection.Query("SELECT 1").FirstOrDefault();
-            }
             return View();
         }
 
@@ -30,6 +26,11 @@ namespace BudgetManagment.Controllers
             {
                 return View(accountType);
             }
+
+            //test user id
+            accountType.UserId = 1;
+            _repositoryAccountTypes.Create(accountType);
+
             // Here you would typically save the new account type to the database
             return View();
         }
