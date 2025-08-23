@@ -1,12 +1,24 @@
 ﻿using BudgetManagment.Models;
+using Dapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 
 namespace BudgetManagment.Controllers
 {
     public class AccountTypesController : Controller
     {
+        private readonly string  _connectionString;
+        public AccountTypesController(IConfiguration configuration)
+        {
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
+        }
         public IActionResult Create()
         {
+            //testing db connection
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = connection.Query("SELECT 1").FirstOrDefault();
+            }
             return View();
         }
 
