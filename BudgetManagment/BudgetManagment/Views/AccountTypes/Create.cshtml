@@ -1,0 +1,48 @@
+﻿@model AccountType
+@{
+    ViewData["Title"] = "Create Account Type";
+}
+
+<h1>Create Account Type</h1>
+<h5>
+    It referes as how we can group accounts
+    Examples: loans, credit cards, etc
+</h5>
+
+<div asp-validation-summary="All" class="text-danger">
+</div>
+<!--calling AccountTypesController.Create [post] when click submit button-->
+<form asp-action="Create">
+    <div class="mb-3">
+        <!-- asp-for puts name of the field in the label-->
+        <label asp-for="Name" class="form-label"></label>
+        <input type="text" asp-for="Name" class=" form-control" />
+        <!--span to show validation error message-->
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Age" class="form-label"></label>
+        <input asp-for="Age" class="form-control" />
+        <span asp-validation-for="Age" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Url" class="form-label"></label>
+        <input asp-for="Url" class="form-control" />
+        <span asp-validation-for="Url" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="CreditCard" class="form-label"></label>
+        <input asp-for="CreditCard" class="form-control" />
+        <span asp-validation-for="CreditCard" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
