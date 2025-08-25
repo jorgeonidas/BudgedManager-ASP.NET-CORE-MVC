@@ -1,6 +1,7 @@
 ﻿using BudgetManagment.Models;
 using BudgetManagment.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections;
 
 namespace BudgetManagment.Controllers
 {
@@ -16,6 +17,14 @@ namespace BudgetManagment.Controllers
         public IActionResult Create()
         {
             return View();
+        }
+
+        // we use Index() to display a list of elements by convention
+        public async Task<IActionResult> Index()
+        {
+            var userId = 1;
+            var accounTypes = await _repositoryAccountTypes.Obtain(userId);
+            return View(accounTypes);
         }
 
         [HttpPost]
@@ -43,7 +52,20 @@ namespace BudgetManagment.Controllers
             await _repositoryAccountTypes.Create(accountType);
 
             // Here you would typically save the new account type to the database
-            return View();
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> VerifyExistingAccountType(string name)
+        {
+            var userId = 1;
+            var alreadyExistAccountType = await _repositoryAccountTypes.Exist(name, userId);
+            if (alreadyExistAccountType)
+            {
+                return Json($"El nombre {name} already exist");
+            }
+            //Account type is available, it will notify to remote fuction
+            return Json(true);
         }
     }
 }

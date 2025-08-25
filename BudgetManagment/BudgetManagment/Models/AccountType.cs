@@ -1,4 +1,5 @@
 ﻿using BudgetManagment.Validations;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace BudgetManagment.Models
@@ -10,6 +11,7 @@ namespace BudgetManagment.Models
         [Required(ErrorMessage = "{0} is required")]
         [Display(Name = "Name of the account type")]// Display attribute to change the name of the field in the validation message
         [FirstCharacterCapitalized]//our custom validation attribute
+        [Remote(action: "VerifyExistingAccountType", controller: "AccountTypes")] //Callin the action when the field is focused
         public string Name { get; set; }
         public int UserId { get; set; }
         public int Orden { get; set; }

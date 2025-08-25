@@ -33,5 +33,19 @@ namespace BudgetManagment.Services
                                                 new { name, userId });
             return  exist == 1;
         }
+
+
+        /// <summary>
+        /// Get accounts registered for this user
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>IEnumerable of AccountType</returns>
+        public async Task<IEnumerable<AccountType>> Obtain(int userId)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.QueryAsync<AccountType>(@"SELECT Id, Name, Orden 
+                                                        FROM AccountTypes 
+                                                        WHERE UserId = @UserId", new { userId });
+        }
     }
 }
