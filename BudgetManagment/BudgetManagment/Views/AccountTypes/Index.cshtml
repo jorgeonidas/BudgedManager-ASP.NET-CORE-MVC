@@ -24,15 +24,15 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var tipoCuenta in Model)
+        @foreach (var accountType in Model)
         {
             <tr>
                 <td>
-                    <a class="btn btn-primary">Editar</a>
+                    <a class="btn btn-primary" asp-action="Edit" asp-route-id="@accountType.Id">Editar</a>
                     <a class="btn btn-danger">Borrar</a>
                 </td>
                 <td>
-                    @tipoCuenta.Name
+                    @accountType.Name
                 </td>
             </tr>
         }

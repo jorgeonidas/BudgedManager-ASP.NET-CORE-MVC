@@ -29,9 +29,9 @@ namespace BudgetManagment.Services
             //query returns 1 if the data exist
             var exist = await connection.QueryFirstOrDefaultAsync<int>(@"SELECT 1 
                                                 FROM AccountTypes 
-                                                WHERE Name = @Name AND UserId = @UserId;", 
+                                                WHERE Name = @Name AND UserId = @UserId;",
                                                 new { name, userId });
-            return  exist == 1;
+            return exist == 1;
         }
 
 
@@ -46,6 +46,24 @@ namespace BudgetManagment.Services
             return await connection.QueryAsync<AccountType>(@"SELECT Id, Name, Orden 
                                                         FROM AccountTypes 
                                                         WHERE UserId = @UserId", new { userId });
+        }
+
+        public async Task Update(AccountType accountType)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            //Executes a query with no return value
+            await connection.ExecuteAsync(@"UPDATE AccountTypes
+                                            SET Name = @Name
+                                            WHERE Id = @Id", accountType);
+        }
+
+        public async Task<AccountType> GetById(int id, int userId)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.QueryFirstOrDefaultAsync<AccountType>(@"SELECT Id, Name, Orden
+                                        FROM AccountTypes
+                                        WHERE Id = @Id AND UserId = @UserId
+                                        ", new { id, userId });
         }
     }
 }

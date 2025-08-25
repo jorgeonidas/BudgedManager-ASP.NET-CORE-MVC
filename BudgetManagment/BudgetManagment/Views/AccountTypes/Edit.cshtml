@@ -1,0 +1,27 @@
+﻿@model AccountType
+@{
+    ViewData["Title"] = "Edit Account Type";
+}
+
+<h1>
+    Edit Account type: @Model.Name
+</h1>
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<form asp-action="Edit">
+    <!--Hidden field to send the model Id in the POST request (not visible in the view)-->
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <!-- asp-for puts name of the field in the label-->
+        <label asp-for="Name" class="form-label"></label>
+        <input type="text" asp-for="Name" class=" form-control" />
+        <!--span to show validation error message-->
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <a class=" btn btn-secondary" asp-action="Index">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

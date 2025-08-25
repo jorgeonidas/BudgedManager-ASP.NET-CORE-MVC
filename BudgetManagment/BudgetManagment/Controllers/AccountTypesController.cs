@@ -45,12 +45,12 @@ namespace BudgetManagment.Controllers
             var alreadyExist = await _repositoryAccountTypes.Exist(accountType.Name, accountType.UserId);
             if (alreadyExist)
             {
-                ModelState.AddModelError(nameof(accountType.Name), 
+                ModelState.AddModelError(nameof(accountType.Name),
                     $"Name {accountType.Name} already exist");
 
                 return View(accountType);
             }
-            
+
             await _repositoryAccountTypes.Create(accountType);
 
             // Here you would typically save the new account type to the database
@@ -68,6 +68,34 @@ namespace BudgetManagment.Controllers
             }
             //Account type is available, it will notify to remote fuction
             return Json(true);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Edit(int id)
+        {
+            var userId = _usersService.GetUserId();
+            var accountType = await _repositoryAccountTypes.GetById(id, userId);
+
+            if (accountType == null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+
+            return View(accountType);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Edit(AccountType accountType)
+        {
+            var userId = _usersService.GetUserId();
+            var accountTypeExist = await _repositoryAccountTypes.GetById(accountType.Id, userId);
+
+            if (accountTypeExist == null)
+            {
+                return RedirectToAction("NotFound", "Home");//NotFound Action from HomeController
+            }
+            await _repositoryAccountTypes.Update(accountType);
+            return RedirectToAction("Index");
         }
     }
 }
