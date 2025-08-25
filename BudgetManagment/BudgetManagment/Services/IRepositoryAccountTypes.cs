@@ -4,6 +4,7 @@ namespace BudgetManagment.Services
 {
     public interface IRepositoryAccountTypes
     {
-        void Create(AccountType accountType);
+        Task Create(AccountType accountType);
+        Task<bool> Exist(string name, int userId);
     }
 }

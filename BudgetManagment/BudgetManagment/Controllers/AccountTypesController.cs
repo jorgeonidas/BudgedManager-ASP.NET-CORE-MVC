@@ -19,7 +19,7 @@ namespace BudgetManagment.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(AccountType accountType)
+        public async Task<IActionResult> Create(AccountType accountType)
         {
             //if the model state is not valid, return the same view with the model to show validation errors
             if (!ModelState.IsValid)
@@ -29,7 +29,18 @@ namespace BudgetManagment.Controllers
 
             //test user id
             accountType.UserId = 1;
-            _repositoryAccountTypes.Create(accountType);
+
+            //check if the account type already exist for this userid
+            var alreadyExist = await _repositoryAccountTypes.Exist(accountType.Name, accountType.UserId);
+            if (alreadyExist)
+            {
+                ModelState.AddModelError(nameof(accountType.Name), 
+                    $"Name {accountType.Name} already exist");
+
+                return View(accountType);
+            }
+            
+            await _repositoryAccountTypes.Create(accountType);
 
             // Here you would typically save the new account type to the database
             return View();

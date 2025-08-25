@@ -12,13 +12,26 @@ namespace BudgetManagment.Services
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public void Create(AccountType accountType)
+        public async Task Create(AccountType accountType)
         {
             using var connection = new SqlConnection(_connectionString);
-            var id = connection.QuerySingle<int>($@"INSERT INTO AccountTypes (Name, UserId, Orden)
+            //dapper code
+            var id = await connection.QuerySingleAsync<int>(@"INSERT INTO AccountTypes (Name, UserId, Orden)
                                                     VALUES (@Name, @UserId, 0);
                                                     SELECT SCOPE_IDENTITY()", accountType);
             accountType.Id = id;
+        }
+
+        public async Task<bool> Exist(string name, int userId)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            //default int value is 0
+            //query returns 1 if the data exist
+            var exist = await connection.QueryFirstOrDefaultAsync<int>(@"SELECT 1 
+                                                FROM AccountTypes 
+                                                WHERE Name = @Name AND UserId = @UserId;", 
+                                                new { name, userId });
+            return  exist == 1;
         }
     }
 }
