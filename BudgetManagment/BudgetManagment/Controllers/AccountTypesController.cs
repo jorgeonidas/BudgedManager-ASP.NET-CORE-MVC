@@ -8,10 +8,12 @@ namespace BudgetManagment.Controllers
     public class AccountTypesController : Controller
     {
         private readonly IRepositoryAccountTypes _repositoryAccountTypes;
+        private readonly IUsersService _usersService;
 
-        public AccountTypesController(IRepositoryAccountTypes repositoryAccountTypes)
+        public AccountTypesController(IRepositoryAccountTypes repositoryAccountTypes, IUsersService usersService)
         {
             this._repositoryAccountTypes = repositoryAccountTypes;
+            this._usersService = usersService;
         }
 
         public IActionResult Create()
@@ -22,7 +24,7 @@ namespace BudgetManagment.Controllers
         // we use Index() to display a list of elements by convention
         public async Task<IActionResult> Index()
         {
-            var userId = 1;
+            var userId = _usersService.GetUserId();
             var accounTypes = await _repositoryAccountTypes.Obtain(userId);
             return View(accounTypes);
         }
@@ -37,7 +39,7 @@ namespace BudgetManagment.Controllers
             }
 
             //test user id
-            accountType.UserId = 1;
+            accountType.UserId = _usersService.GetUserId();
 
             //check if the account type already exist for this userid
             var alreadyExist = await _repositoryAccountTypes.Exist(accountType.Name, accountType.UserId);
@@ -58,7 +60,7 @@ namespace BudgetManagment.Controllers
         [HttpGet]
         public async Task<IActionResult> VerifyExistingAccountType(string name)
         {
-            var userId = 1;
+            var userId = _usersService.GetUserId();
             var alreadyExistAccountType = await _repositoryAccountTypes.Exist(name, userId);
             if (alreadyExistAccountType)
             {
