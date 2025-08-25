@@ -65,5 +65,11 @@ namespace BudgetManagment.Services
                                         WHERE Id = @Id AND UserId = @UserId
                                         ", new { id, userId });
         }
+
+        public async Task Delete(int id)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.ExecuteAsync(@"DELETE AccountTypes WHERE Id = @Id", new { id });
+        } 
     }
 }
