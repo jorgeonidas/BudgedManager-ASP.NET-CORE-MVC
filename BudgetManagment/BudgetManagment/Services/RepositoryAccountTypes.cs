@@ -16,9 +16,9 @@ namespace BudgetManagment.Services
         {
             using var connection = new SqlConnection(_connectionString);
             //dapper code
-            var id = await connection.QuerySingleAsync<int>(@"INSERT INTO AccountTypes (Name, UserId, Orden)
-                                                    VALUES (@Name, @UserId, 0);
-                                                    SELECT SCOPE_IDENTITY()", accountType);
+            //launch Store procedure from SQL MANAGMENT STUDIO
+            var id = await connection.QuerySingleAsync<int>("AccountTypes_Insert",
+                new { UserId = accountType.UserId, Name = accountType.Name }, commandType: System.Data.CommandType.StoredProcedure);
             accountType.Id = id;
         }
 
@@ -45,7 +45,8 @@ namespace BudgetManagment.Services
             using var connection = new SqlConnection(_connectionString);
             return await connection.QueryAsync<AccountType>(@"SELECT Id, Name, Orden 
                                                         FROM AccountTypes 
-                                                        WHERE UserId = @UserId", new { userId });
+                                                        WHERE UserId = @UserId
+                                                        ORDER BY Orden", new { userId });
         }
 
         public async Task Update(AccountType accountType)
@@ -71,5 +72,12 @@ namespace BudgetManagment.Services
             using var connection = new SqlConnection(_connectionString);
             await connection.ExecuteAsync(@"DELETE AccountTypes WHERE Id = @Id", new { id });
         } 
+
+        public async Task Order(IEnumerable<AccountType> accountTypesOrdered)
+        {
+            var query = "UPDATE AccountTypes SET Orden = @Orden where Id = @Id";
+            using var connection = new SqlConnection(_connectionString);
+            await connection.ExecuteAsync(query, accountTypesOrdered);
+        }
     }
 }

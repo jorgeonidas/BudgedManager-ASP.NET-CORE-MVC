@@ -127,5 +127,28 @@ namespace BudgetManagment.Controllers
 
             return RedirectToAction("Index");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Order([FromBody] int[] ids)
+        {
+            var userId = _usersService.GetUserId();
+            var accountTypes = await _repositoryAccountTypes.Obtain(userId);
+            var accountTypesIds = accountTypes.Select(x => x.Id);
+
+            //checking provided account types belongs to user
+            var idsAccounTypesNotBelongingToUser = ids.Except(accountTypesIds).ToList();
+            if(idsAccounTypesNotBelongingToUser.Count > 0)
+            {
+                return Forbid();
+            }
+
+            var orderedAccountTypes = ids.Select(
+                (value, index) => new AccountType() { Id = value, Orden = index + 1 })
+                .AsEnumerable();
+
+            await _repositoryAccountTypes.Order(orderedAccountTypes);
+
+            return Ok();
+        }
     }
 }
