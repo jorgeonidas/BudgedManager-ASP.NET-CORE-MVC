@@ -21,5 +21,17 @@ namespace BudgetManagment.Services
                 SELECT SCOPE_IDENTITY();", account);
             account.Id = id;
         }
+
+        public async Task<IEnumerable<Account>> Search(int userId)
+        {
+            using var connection = new SqlConnection(connectionString);
+            return await connection.QueryAsync<Account>(
+                @"SELECT Accounts.Id, Accounts.Name, Balance, ac.Name as AccountType
+                FROM Accounts
+                INNER JOIN AccountTypes ac
+                ON ac.Id = Accounts.AccountTypeId
+                WHERE ac.UserId = @UserId
+                ORDER BY ac.Orden", new { userId });
+        }
     }
 }

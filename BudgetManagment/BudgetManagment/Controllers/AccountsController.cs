@@ -20,6 +20,22 @@ namespace BudgetManagment.Controllers
             this._usersService = usersService;
             this._repositoryAccounts = repositoryAccounts;
         }
+
+        public async Task<IActionResult> Index()
+        {
+            var userId = _usersService.GetUserId();
+            var accountsWithAccountType = await _repositoryAccounts.Search(userId);
+
+            var model = accountsWithAccountType
+                        .GroupBy(x => x.AccountType)
+                        .Select(group => new AccountIndexViewModel{
+                            AccountType = group.Key,
+                            Accounts = group.AsEnumerable()
+                        }).ToList();
+
+            return View(model);
+        }
+
         [HttpGet]
         public async Task<IActionResult> Create()
         {
