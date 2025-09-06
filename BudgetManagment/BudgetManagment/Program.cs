@@ -7,7 +7,13 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IRepositoryAccountTypes, RepositoryAccountTypes>();
 builder.Services.AddTransient<IUsersService, UsersService>();
 builder.Services.AddTransient<IRepositoryAccounts, RepositoryAccounts>();
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<BudgetManagment.Services.AutoMapperProfile>();
+});
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

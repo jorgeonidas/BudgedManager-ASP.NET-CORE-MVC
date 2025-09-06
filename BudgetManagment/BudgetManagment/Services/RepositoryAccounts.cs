@@ -33,5 +33,31 @@ namespace BudgetManagment.Services
                 WHERE ac.UserId = @UserId
                 ORDER BY ac.Orden", new { userId });
         }
+
+        public async Task<Account> GetAccountById(int id, int userId)
+        {
+            using var connection = new SqlConnection(connectionString);
+            return await connection.QueryFirstOrDefaultAsync<Account>(
+                @"SELECT Accounts.Id, Accounts.Name, Accounts.Balance, Accounts.Description, Accounts.AccountTypeId, ac.Name as AccountType
+                  FROM Accounts
+                  INNER JOIN AccountTypes ac
+                  ON ac.Id = Accounts.AccountTypeId
+                  WHERE ac.UserId = @UserId AND Accounts.Id = @Id", new { id, userId });
+        }
+
+        public async Task Update(Account account)
+        {
+            using var connection = new SqlConnection(connectionString);
+            await connection.ExecuteAsync(@"UPDATE Accounts
+                            SET Name = @Name, Balance = @Balance, Description = @Description,
+                            AccountTypeId = @AccountTypeId
+                            WHERE Id = @Id", account);
+        }
+
+        public async Task<int> Delete(int id)
+        {
+            using var connection = new SqlConnection(connectionString);
+            return await connection.ExecuteAsync("DELETE Accounts WHERE Id = @Id", new { id });
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using BudgetManagment.Models;
+﻿using AutoMapper;
+using BudgetManagment.Models;
 using BudgetManagment.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,14 +12,17 @@ namespace BudgetManagment.Controllers
         private readonly IRepositoryAccountTypes _repositoryAccountTypes;
         private readonly IUsersService _usersService;
         private readonly IRepositoryAccounts _repositoryAccounts;
+        private readonly IMapper _mapper;
 
         public AccountsController(IRepositoryAccountTypes repositoryAccountTypes, 
                                     IUsersService usersService, 
-                                    IRepositoryAccounts repositoryAccounts)
+                                    IRepositoryAccounts repositoryAccounts,
+                                    IMapper mapper)
         {
             this._repositoryAccountTypes = repositoryAccountTypes;
             this._usersService = usersService;
             this._repositoryAccounts = repositoryAccounts;
+            this._mapper = mapper;
         }
 
         public async Task<IActionResult> Index()
@@ -63,6 +67,73 @@ namespace BudgetManagment.Controllers
             }
 
             await _repositoryAccounts.Create(account);
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var userId = _usersService.GetUserId();
+            var account = await _repositoryAccounts.GetAccountById(id, userId);
+            if (account is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+            //OLD: Map the account to the view model
+           /* var model = new AccountCreationViewModel()
+            {
+                Id = account.Id,
+                Name = account.Name,
+                AccountType = account.AccountType,
+                Balance = account.Balance,
+                Description = account.Description,
+            };*/
+           //using auto mapper
+            var model = _mapper.Map<AccountCreationViewModel>(account);
+            model.AccounTypes = await ObtainAccountTypes(userId);
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(AccountCreationViewModel editAccount)
+        {
+            var userId = _usersService.GetUserId();
+            var account = await _repositoryAccounts.GetAccountById(editAccount.Id, userId);
+            if (account is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+            var accountType = await _repositoryAccountTypes.GetById(account.AccountTypeId, userId);
+            if (accountType == null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+
+            await _repositoryAccounts.Update(editAccount);
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userId = _usersService.GetUserId();
+            var account = await _repositoryAccounts.GetAccountById(id, userId);
+            if (account is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+            return View(account);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteAccount(int id)
+        {
+            var userId = _usersService.GetUserId();
+            var account = await _repositoryAccounts.GetAccountById(id, userId);
+            if (account is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+            await _repositoryAccounts.Delete(id);
             return RedirectToAction("Index");
         }
 
