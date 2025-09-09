@@ -22,6 +22,6 @@ namespace BudgetManagment.Models
         public IEnumerable<SelectListItem> Categories { get; set; }
         [Display(Name = "Operation Type")]
 
-        public OperationType OperationTypeId { get; set; }
+        public OperationType OperationTypeId { get; set; } = OperationType.Income;
     }
 }
