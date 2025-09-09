@@ -15,6 +15,13 @@ namespace BudgetManagment.Controllers
             this._usersService = usersService;
         }
 
+        public async Task<IActionResult> Index()
+        {
+            var userId = _usersService.GetUserId();
+            var categories = await _repositoryCategories.Get(userId);
+            return View(categories);
+        }
+
         [HttpGet]
         public IActionResult Create()
         {
@@ -31,6 +38,35 @@ namespace BudgetManagment.Controllers
             category.UserId = _usersService.GetUserId();
             await _repositoryCategories.Create(category);
             return RedirectToAction("Index");
-        }   
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var userId = _usersService.GetUserId();
+            var category = await _repositoryCategories.GetById(id, userId);
+            if (category is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+            return View(category);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(Category categoryToEdit)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(categoryToEdit);
+            }
+            var userId = _usersService.GetUserId();
+            var category = await _repositoryCategories.GetById(categoryToEdit.Id, userId);
+            if (category is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+            categoryToEdit.UserId = userId;
+            await _repositoryCategories.Update(categoryToEdit);
+            return RedirectToAction("Index");
+        }
     }
 }
