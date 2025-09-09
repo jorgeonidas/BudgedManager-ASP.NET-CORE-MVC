@@ -68,5 +68,29 @@ namespace BudgetManagment.Controllers
             await _repositoryCategories.Update(categoryToEdit);
             return RedirectToAction("Index");
         }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userId = _usersService.GetUserId();
+            var category = await _repositoryCategories.GetById(id, userId);
+            if (category is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+            return View(category);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            var userId = _usersService.GetUserId();
+            var category = await _repositoryCategories.GetById(id, userId);
+            if (category is null)
+            {
+                return RedirectToAction("NotFound", "Home");
+            }
+            await _repositoryCategories.Delete(id);
+            return RedirectToAction("Index");
+        }
     }
 }

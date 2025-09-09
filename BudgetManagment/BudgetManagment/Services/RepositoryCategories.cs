@@ -45,5 +45,11 @@ namespace BudgetManagment.Services
                                             SET Name = @Name, OperationTypeId = @OperationTypeId
                                             WHERE Id = @Id", category);
         }
+
+        public async Task<int> Delete(int id)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.ExecuteAsync(@"DELETE Categories WHERE Id = @Id", new { id });
+        }
     }
 }
