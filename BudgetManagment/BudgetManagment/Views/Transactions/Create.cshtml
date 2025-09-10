@@ -24,7 +24,7 @@
     <!--TODO: is not displaying default Operation Id category-->
     <div class="mb-3">
         <label asp-for="CategoryId" class="form-label"></label>
-        <select asp-for="CategoryId" class="form-select"></select>
+        <select asp-for="CategoryId" asp-items="Model.Categories" class="form-select"></select>
         <span asp-validation-for="CategoryId" class="text-danger"></span>
     </div>
     <div class="mb-3">
@@ -53,7 +53,6 @@
                                 body: selectedValue,
                                 headers: {
                                      'Content-Type': 'application/json'
-
                                 }
                         });
                         const json = await response.json();
@@ -62,5 +61,4 @@
                 })
         })
     </script>
-
 }
