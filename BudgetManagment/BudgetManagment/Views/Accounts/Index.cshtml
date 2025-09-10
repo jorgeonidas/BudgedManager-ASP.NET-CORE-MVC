@@ -67,7 +67,7 @@
                             <li class="list-group-item">
                                 <span>
                                     <strong>
-                                        @account.Name
+                                        <a asp-action="Details" asp-route-id="@account.Id">@account.Name</a>
                                     </strong>
                                     <!--Edit button calling Edit action from AccountController passing account.Id as parameter-->
                                     <a asp-action="Edit" asp-route-id="@account.Id" class=" btn btn-primary">

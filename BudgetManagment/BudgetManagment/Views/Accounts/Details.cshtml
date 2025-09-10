@@ -1,0 +1,17 @@
+﻿@model DetailedTransactionReport
+@{
+    ViewData["Title"] = "Account Details";
+}
+<h1>Movements @ViewBag.Account</h1>
+<h4>
+    <a asp-route-month="@ViewBag.previousMonth" asp-route-year="@ViewBag.previousYear"
+       class="btn btn-secondary">
+        <i class="bi-chevron-left"></i>
+    </a>
+    @Model.StartDate.ToString("MMM") - @Model.StartDate.Year
+
+    <a asp-route-month="@ViewBag.followingMonth" asp-route-year="@ViewBag.followingYear"
+       class="btn btn-secondary">
+        <i class="bi-chevron-right"></i>
+    </a>
+</h4>
