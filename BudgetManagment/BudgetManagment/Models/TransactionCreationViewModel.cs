@@ -20,8 +20,5 @@ namespace BudgetManagment.Models
         /// List of categories to be displayed as options in a dropdown menu.
         /// </summary>
         public IEnumerable<SelectListItem> Categories { get; set; }
-        [Display(Name = "Operation Type")]
-
-        public OperationType OperationTypeId { get; set; } = OperationType.Income;
     }
 }
