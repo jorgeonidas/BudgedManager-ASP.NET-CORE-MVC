@@ -39,6 +39,26 @@ namespace BudgetManagment.Controllers
             return View(model);
         }
 
+        public IActionResult Weekly()
+        {
+            return View();
+        }
+
+        public IActionResult Monthly()
+        {
+            return View();
+        }
+
+        public IActionResult ExcelReport()
+        {
+            return View();
+        }
+
+        public IActionResult Calendar()
+        {
+            return View();
+        }
+
         public async Task<IActionResult> Create()
         {
             var userId = _usersService.GetUserId();
