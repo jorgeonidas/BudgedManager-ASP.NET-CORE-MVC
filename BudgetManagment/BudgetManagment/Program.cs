@@ -9,6 +9,8 @@ builder.Services.AddTransient<IUsersService, UsersService>();
 builder.Services.AddTransient<IRepositoryAccounts, RepositoryAccounts>();
 builder.Services.AddTransient<IRepositoryCategories, RepositoryCategories>();
 builder.Services.AddTransient<IRepositoryTransactions, RepositoryTransactions>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<IReportsService, ReportsService>();
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<BudgetManagment.Services.AutoMapperProfile>();
@@ -34,7 +36,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Transactions}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 

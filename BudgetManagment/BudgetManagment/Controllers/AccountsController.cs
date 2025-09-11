@@ -14,18 +14,21 @@ namespace BudgetManagment.Controllers
         private readonly IRepositoryAccounts _repositoryAccounts;
         private readonly IMapper _mapper;
         private readonly IRepositoryTransactions _repositoryTransactions;
+        private readonly IReportsService _reportsService;
 
         public AccountsController(IRepositoryAccountTypes repositoryAccountTypes, 
                                     IUsersService usersService, 
                                     IRepositoryAccounts repositoryAccounts,
                                     IMapper mapper,
-                                    IRepositoryTransactions repositoryTransactions)
+                                    IRepositoryTransactions repositoryTransactions,
+                                    IReportsService reportsService)
         {
             this._repositoryAccountTypes = repositoryAccountTypes;
             this._usersService = usersService;
             this._repositoryAccounts = repositoryAccounts;
             this._mapper = mapper;
             this._repositoryTransactions = repositoryTransactions;
+            this._reportsService = reportsService;
         }
 
         public async Task<IActionResult> Index()
@@ -52,51 +55,8 @@ namespace BudgetManagment.Controllers
                 return RedirectToAction("NotFound", "Home");
             }
 
-            DateTime startDate;
-            DateTime finishDate;
-
-            if(month <= 0 || month > 12 || year <= 1900)
-            {
-                var today = DateTime.Today;
-                startDate = new DateTime(today.Year, today.Month, 1);
-            }
-            else
-            {
-                startDate = new DateTime(year, month, 1);
-            }
-            //We want the last day of the month
-            finishDate = startDate.AddMonths(1).AddDays(-1);
-
-            var getTransasctionsByAccoun = new GetTransactionsByAccount()
-            {
-                AccountId = id,
-                UserId = userId,
-                StartDate = startDate,
-                FinishDate = finishDate
-            };
-
-            var transactions = await _repositoryTransactions.GetByAccounId(getTransasctionsByAccoun);
-            var model = new DetailedTransactionReport();
             ViewBag.Account = account.Name;
-
-            var transactiosnPerDate = transactions.OrderByDescending(x => x.TransactionDate)
-                                                 .GroupBy(x => x.TransactionDate)
-                                                 .Select(group => new DetailedTransactionReport.TransactionPerDate()
-                                                 {
-                                                     TransactionDate = group.Key,
-                                                     Transactions = group.AsEnumerable()
-                                                 });
-
-            model.GroupedTransactions = transactiosnPerDate;
-            model.StartDate = startDate;
-            model.FinishDate = finishDate;
-
-            ViewBag.previousMonth = startDate.AddMonths(-1).Month;
-            ViewBag.previousYear = startDate.AddMonths(-1).Year;
-            ViewBag.followingMonth = startDate.AddMonths(1).Month;
-            ViewBag.followingYear = startDate.AddMonths(1).Year ;
-            //To return to the same page after creating a new transaction
-            ViewBag.returningUrl = HttpContext.Request.Path + HttpContext.Request.QueryString;
+            var model = await _reportsService.GetDetailedTransactionReportByAccount(userId, id, month, year, ViewBag);
 
             return View(model);
         }

@@ -44,6 +44,23 @@ namespace BudgetManagment.Services
                                                model);
         }
 
+        public async Task<IEnumerable<Transaction>> GetByUserId(TransasctionsPerUserParameters model)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.QueryAsync<Transaction>(
+                                                @"SELECT t.Id, t.Amount, t.TransactionDate, c.Name as Category,
+                                                accounts.Name as Account, c.OperationTypeId
+                                                FROM Transactions t
+                                                INNER JOIN Categories c
+                                                ON c.Id = t.CategoryId
+                                                INNER JOIN Accounts accounts
+                                                ON accounts.Id = t.AccountId
+                                                WHERE t.UserId = @UserId
+                                                AND TransactionDate BETWEEN @StartDate and @FinishDate
+                                                ORDER BY t.TransactionDate DESC",
+                                               model);
+        }
+
         public async Task Update(Transaction transaction, decimal previousAmount, int previousAccountId)
         {
             using var connection = new SqlConnection(_connectionString);

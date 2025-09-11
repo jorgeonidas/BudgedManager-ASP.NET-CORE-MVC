@@ -4,6 +4,7 @@ using BudgetManagment.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace BudgetManagment.Controllers
 {
@@ -14,22 +15,28 @@ namespace BudgetManagment.Controllers
         private readonly IRepositoryCategories _repositoryCategories;
         private readonly IRepositoryTransactions _repositoryTransactions;
         private readonly IMapper _mapper;
+        private readonly IReportsService _reportsService;
 
         public TransactionsController(IUsersService usersService,
                                         IRepositoryAccounts repositoryAccounts,
                                         IRepositoryCategories repositoryCategories,
-                                        IRepositoryTransactions repositoryTransactions, IMapper mapper)
+                                        IRepositoryTransactions repositoryTransactions, 
+                                        IMapper mapper,
+                                        IReportsService reportsService)
         {
             this._usersService = usersService;
             this._repositoryAccounts = repositoryAccounts;
             this._repositoryCategories = repositoryCategories;
             this._repositoryTransactions = repositoryTransactions;
             this._mapper = mapper;
+            this._reportsService = reportsService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index(int month, int year)
         {
-            return View();
+            var userId = _usersService.GetUserId();
+            var model = await _reportsService.GetDetailedTransactionReport(userId, month, year, ViewBag);
+            return View(model);
         }
 
         public async Task<IActionResult> Create()
