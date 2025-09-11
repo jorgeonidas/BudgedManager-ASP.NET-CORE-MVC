@@ -3,6 +3,7 @@ using BudgetManagment.Models;
 using BudgetManagment.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Reflection;
 
 namespace BudgetManagment.Controllers
 {
@@ -14,7 +15,7 @@ namespace BudgetManagment.Controllers
         private readonly IRepositoryTransactions _repositoryTransactions;
         private readonly IMapper _mapper;
 
-        public TransactionsController(IUsersService usersService, 
+        public TransactionsController(IUsersService usersService,
                                         IRepositoryAccounts repositoryAccounts,
                                         IRepositoryCategories repositoryCategories,
                                         IRepositoryTransactions repositoryTransactions, IMapper mapper)
@@ -41,10 +42,10 @@ namespace BudgetManagment.Controllers
         }
 
         [HttpPost]
-        public async Task <IActionResult> Create(TransactionCreationViewModel model)
+        public async Task<IActionResult> Create(TransactionCreationViewModel model)
         {
             var userId = _usersService.GetUserId();
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 //return to create view
                 model.Categories = await GetCategories(userId, model.OperationTypeId);
@@ -53,19 +54,19 @@ namespace BudgetManagment.Controllers
             }
             //validate account
             var account = await _repositoryAccounts.GetAccountById(model.AccountId, userId);
-            if(account is null)
+            if (account is null)
             {
                 return RedirectToAction("NotFound", "Home");
             }
             //validate category
             var category = await _repositoryCategories.GetById(model.AccountId, userId);
-            if(category is null)
+            if (category is null)
             {
                 return RedirectToAction("NotFound", "Home");
             }
-           
-            model.UserId = userId;  
-            if(model.OperationTypeId == OperationType.Expense)
+
+            model.UserId = userId;
+            if (model.OperationTypeId == OperationType.Expense)
             {
                 model.Amount *= -1;
             }
@@ -75,16 +76,23 @@ namespace BudgetManagment.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, string returningUrl = null)
         {
             var userId = _usersService.GetUserId();
             var transaction = await _repositoryTransactions.GetById(id, userId);
-            if(transaction is null)
+            if (transaction is null)
             {
                 return RedirectToAction("NotFound", "Home");
             }
             await _repositoryTransactions.Delete(id);
-            return RedirectToAction("Index");
+            if (!string.IsNullOrEmpty(returningUrl))
+            {
+                return LocalRedirect(returningUrl);
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
         }
 
         private async Task<IEnumerable<SelectListItem>> GetAccounts(int userId)
@@ -94,24 +102,24 @@ namespace BudgetManagment.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id, string returningUrl = null)
         {
             var userId = _usersService.GetUserId();
             var transaction = await _repositoryTransactions.GetById(id, userId);
-            if(transaction is null)
+            if (transaction is null)
             {
                 return RedirectToAction("NotFound", "Home");
             }
             var model = _mapper.Map<TransactionUpdateViewModel>(transaction);
             model.PreviousAmount = model.Amount;
-            if(model.OperationTypeId == OperationType.Expense)
+            if (model.OperationTypeId == OperationType.Expense)
             {
                 model.Amount = model.Amount * -1;
             }
             model.PreviousAccountId = transaction.AccountId;
             model.Categories = await GetCategories(userId, transaction.OperationTypeId);
             model.Accounts = await GetAccounts(userId);
-
+            model.ReturningUrl = returningUrl;
             return View(model);
         }
 
@@ -128,28 +136,35 @@ namespace BudgetManagment.Controllers
             }
 
             var account = await _repositoryAccounts.GetAccountById(model.AccountId, userId);
-            if(account is null)
+            if (account is null)
             {
                 return RedirectToAction("NotFound", "Home");
             }
 
             var category = await _repositoryCategories.GetById(model.CategoryId, userId);
-            if(category is null)
+            if (category is null)
             {
                 return RedirectToAction("NotFound", "Home");
             }
 
             var transaction = _mapper.Map<Transaction>(model);
-            if(model.OperationTypeId == OperationType.Expense)
+            if (model.OperationTypeId == OperationType.Expense)
             {
                 transaction.Amount = model.Amount * -1;
             }
 
             await _repositoryTransactions.Update(transaction, model.PreviousAmount, model.PreviousAccountId);
-            return RedirectToAction("Index");
+            if (!string.IsNullOrEmpty(model.ReturningUrl))
+            {
+                return LocalRedirect(model.ReturningUrl);
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
         }
 
-        private async Task<IEnumerable<SelectListItem>> GetCategories(int userId, 
+        private async Task<IEnumerable<SelectListItem>> GetCategories(int userId,
             OperationType operationType)
         {
             var categories = await _repositoryCategories.Get(userId, operationType);

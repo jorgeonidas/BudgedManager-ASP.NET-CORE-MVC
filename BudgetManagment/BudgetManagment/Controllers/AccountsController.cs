@@ -95,6 +95,8 @@ namespace BudgetManagment.Controllers
             ViewBag.previousYear = startDate.AddMonths(-1).Year;
             ViewBag.followingMonth = startDate.AddMonths(1).Month;
             ViewBag.followingYear = startDate.AddMonths(1).Year ;
+            //To return to the same page after creating a new transaction
+            ViewBag.returningUrl = HttpContext.Request.Path + HttpContext.Request.QueryString;
 
             return View(model);
         }
