@@ -13,6 +13,20 @@ namespace BudgetManagment.Services
             this._httpContext = httpContextAccessor.HttpContext;
         }
 
+        public async Task<IEnumerable<ResultByWeek>> GetWeelkyReport(int userId, int month, int year, dynamic viewBag)
+        {
+            (DateTime startDate, DateTime finishDate) = GenerateStartAndFinishDate(month, year);
+            var parameter = new TransasctionsPerUserParameters
+            {
+                UserId = userId,
+                StartDate = startDate,
+                FinishDate = finishDate
+            };
+            FillViewBag(viewBag, startDate);
+            var model = await _repositoryTransactions.GetResultsByWeek(parameter);
+            return model;
+        }
+
         public async Task<DetailedTransactionReport>
              GetDetailedTransactionReport(int userId, int month, int year, dynamic viewBag)
         {
@@ -29,11 +43,11 @@ namespace BudgetManagment.Services
             return model;
         }
 
-        public async Task<DetailedTransactionReport> 
-            GetDetailedTransactionReportByAccount(int userId, 
-                                        int accountId, 
-                                        int month, 
-                                        int year, 
+        public async Task<DetailedTransactionReport>
+            GetDetailedTransactionReportByAccount(int userId,
+                                        int accountId,
+                                        int month,
+                                        int year,
                                         dynamic viewBag)
         {
             (DateTime startDate, DateTime finishDate) = GenerateStartAndFinishDate(month, year);
@@ -80,7 +94,7 @@ namespace BudgetManagment.Services
             return model;
         }
 
-        private (DateTime startDate, DateTime finishDate)  GenerateStartAndFinishDate(int month, int year)
+        private (DateTime startDate, DateTime finishDate) GenerateStartAndFinishDate(int month, int year)
         {
             DateTime startDate;
             DateTime finishDate;

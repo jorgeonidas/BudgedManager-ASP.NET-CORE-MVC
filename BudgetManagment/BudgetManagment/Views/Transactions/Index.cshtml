@@ -3,4 +3,7 @@
     ViewData["Title"] = "Dayli Report";
 }
 <partial name="_SubMenu" Model="TransactionsSubMenu.Dayli" />
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-primary">Create a new Transaction</a>
+</div>
 <partial name="_DetailedTransactionReport" model="Model" />

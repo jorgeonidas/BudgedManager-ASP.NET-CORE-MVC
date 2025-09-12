@@ -10,8 +10,8 @@
 }
 
 .active-balance{
-    color: blue;
+    color: blue !important;
 }
 .passive-balance {
-    color: red;
+    color: red !important;
 }

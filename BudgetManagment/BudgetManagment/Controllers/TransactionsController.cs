@@ -39,9 +39,70 @@ namespace BudgetManagment.Controllers
             return View(model);
         }
 
-        public IActionResult Weekly()
+        public async Task<IActionResult> Weekly(int month, int year)
         {
-            return View();
+            var userId = _usersService.GetUserId();
+            IEnumerable<ResultByWeek> weeklyTransactions = 
+                await _reportsService.GetWeelkyReport(userId, month, year, ViewBag);
+            var grouped = weeklyTransactions
+                .GroupBy(x => x.Week)
+                .Select(x => new ResultByWeek()
+                {
+                    Week = x.Key,
+                    Income = x.
+                            Where(x => x.OperationTypeId == OperationType.Income).
+                            Select(x => x.Amount)
+                            .FirstOrDefault(),
+                    Expense = x.
+                                Where(x => x.OperationTypeId == OperationType.Expense).
+                                Select(x => x.Amount).
+                                FirstOrDefault(),
+
+                }).ToList();
+
+            if (year == 0 || month == 0)
+            {
+                var today = DateTime.Today;
+                year = today.Year;
+                month = today.Month;
+            }
+
+            var referenceDate = new DateTime(year, month, 1);
+            var daysOfMonth = Enumerable.Range(1, referenceDate.AddMonths(1).AddDays(-1).Day);
+
+            var segmentedDays = daysOfMonth.Chunk(7).ToList();
+
+            for (int i = 0; i < segmentedDays.Count; i++)
+            {
+                var week = i + 1;
+                var startDay = new DateTime(year, month, segmentedDays[i].First());
+                var endDate = new DateTime(year, month, segmentedDays[i].Last());
+                var weekGroup = grouped.FirstOrDefault(x => x.Week == week);
+
+                if(weekGroup is null)
+                {
+                    grouped.Add(new ResultByWeek()
+                    {
+                        Week = week,
+                        StartDate = startDay,
+                        EndDate = endDate,
+                    });
+                }
+                else
+                {
+                    weekGroup.StartDate = startDay;
+                    weekGroup.EndDate = endDate;
+                }
+            }
+
+            grouped = grouped.OrderByDescending(x => x.Week).ToList();
+            var model = new WeeklyReportViewModel()
+            {
+                TransactionsByWeek = grouped,
+                DateOfReference = referenceDate
+            };
+
+            return View(model);
         }
 
         public IActionResult Monthly()

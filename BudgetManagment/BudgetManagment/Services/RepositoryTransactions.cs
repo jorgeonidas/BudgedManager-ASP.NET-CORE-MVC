@@ -91,6 +91,19 @@ namespace BudgetManagment.Services
             );
         }
 
+        public async Task<IEnumerable<ResultByWeek>> GetResultsByWeek(TransasctionsPerUserParameters model)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.QueryAsync<ResultByWeek>(@"SELECT DATEDIFF(d,@startDate,TransactionDate) / 7 + 1 as WeekDays,
+                                    SUM(Amount) as Amount, cat.OperationTypeId
+                                    FROM Transactions
+                                    INNER JOIN Categories cat
+                                    ON cat.Id = Transactions.CategoryId
+                                    WHERE Transactions.UserId = @userId AND
+                                    TransactionDate BETWEEN @startDate AND @finishDate
+                                    GROUP BY DATEDIFF(d,@startDate,TransactionDate) / 7, cat.OperationTypeId", model);
+        }
+
         public async Task Delete(int id)
         {
             using var connection = new SqlConnection(_connectionString);
