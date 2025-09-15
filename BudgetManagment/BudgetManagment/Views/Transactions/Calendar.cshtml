@@ -2,3 +2,101 @@
     ViewData["Title"] = "Calendar Report";
 }
 <partial name="_SubMenu" Model="TransactionsSubMenu.Calendar" />
+
+<div id="calendar"></div>
+<div class="modal fade" id="transactionsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Transactions of the day</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th id="modalDateTable" colspan="2"></th>
+                            <th id="modalIncomeTable" class="active-balance"></th>
+                            <th id="modalTableExpenses" class="passive-balance"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalBodyTable">
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>s
+
+@section Scripts{
+    <script src="~/lib/fullcalendar/main.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                dayMaxEventRows: 3,
+                initialView: 'dayGridMonth',
+                events: '/transactions/GetTransactionCalendar',
+                dateClick: async function(info){
+                    await searchTransactionsByDate(info.dateStr);
+                }
+            });
+            calendar.render();
+        });
+
+        async function searchTransactionsByDate(date){
+            try {
+                const response = await fetch(`/transactions/GetTransactionByDate?date=${date}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    console.error('Failed to fetch transactions', response.statusText);
+                    return;
+                }
+
+                const json = await response.json();
+               
+                let income = 0;
+                let expenses = 0;   
+                const operationTypeIncome = 1;
+
+                const fomatter = new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                });
+
+                const rows = json.map(transaction => {
+                    if(transaction.operationTypeId === operationTypeIncome){
+                        income += transaction.amount;
+                    }else{
+                        expenses += transaction.amount;
+                    }
+                    return `<tr>
+                        <td>${transaction.category}</td>
+                        <td>${transaction.account}</td>
+                        <td align="right" colspan="2"
+                        class=${transaction.operationTypeId === operationTypeIncome ? 
+                            'active-balance' : 'passive-balance'}>
+                        ${fomatter.format(transaction.amount)}</td>
+                    </tr>`;
+                });
+
+                $("#modalBodyTable").html(rows);
+                $("#modalIncomeTable").html(fomatter.format(income));
+                $("#modalTableExpenses").html(fomatter.format(expenses));
+                $("#modalDateTable").html(date);
+
+                const modalEl = document.getElementById('transactionsModal');
+                const transactionsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                transactionsModal.show();
+            } catch (err) {
+                console.error('Error fetching transactions', err);
+            }
+        }
+    </script>
+}
