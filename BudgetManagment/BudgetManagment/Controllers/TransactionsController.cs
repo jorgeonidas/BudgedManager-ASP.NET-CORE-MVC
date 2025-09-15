@@ -105,9 +105,46 @@ namespace BudgetManagment.Controllers
             return View(model);
         }
 
-        public IActionResult Monthly()
+        public async Task<IActionResult> Monthly(int year)
         {
-            return View();
+            var userId = _usersService.GetUserId();
+            if(year == 0)
+            {
+                year = DateTime.Today.Year;
+            }
+            var transactionsPerMonth = await _repositoryTransactions.GetByMonth(userId, year);
+            var groupedTransactions = transactionsPerMonth.GroupBy(x => x.Month).Select(x => new GetByMonthResult
+            {
+                Month = x.Key,
+                Income = x.Where(x => x.OperationTypeId == OperationType.Income).Select(x => x.Amount).FirstOrDefault(),
+                Expense = x.Where(x => x.OperationTypeId == OperationType.Expense).Select(x => x.Amount).FirstOrDefault(),
+            })
+            .ToList();
+
+            for (int month = 1; month < 12; month++)
+            {
+                var transaction = groupedTransactions.FirstOrDefault(x => x.Month == month);
+                var referenceDate = new DateTime(year, month, 1);
+                if (transaction is null)
+                {
+                    groupedTransactions.Add(new GetByMonthResult()
+                    {
+                        Month = month,
+                        ReferenceDate = referenceDate,
+                    });
+                }
+                else
+                {
+                    transaction.ReferenceDate = referenceDate;
+                }
+            }
+            groupedTransactions = groupedTransactions.OrderByDescending(x => x.Month).ToList();
+            var model = new MonthlyReportViewModel()
+            {
+                MonthlyTransactions = groupedTransactions,
+                Year = year
+            };
+            return View(model);
         }
 
         public IActionResult ExcelReport()

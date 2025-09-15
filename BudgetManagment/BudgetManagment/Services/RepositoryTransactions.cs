@@ -104,6 +104,18 @@ namespace BudgetManagment.Services
                                     GROUP BY DATEDIFF(d,@startDate,TransactionDate) / 7, cat.OperationTypeId", model);
         }
 
+        public async Task<IEnumerable<GetByMonthResult>> GetByMonth(int userId, int year)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            return await connection .QueryAsync<GetByMonthResult>(@"SELECT MONTH(TransactionDate) as Month,
+                                SUM(Amount) as Amount, cat.OperationTypeId
+                                FROM Transactions
+                                INNER JOIN Categories cat
+                                ON	cat.Id = Transactions.CategoryId
+                                WHERE Transactions.UserId = @userId AND YEAR(TransactionDate) = @year
+                                GROUP BY MONTH(TransactionDate), cat.OperationTypeId", new { userId, year });
+        }
+
         public async Task Delete(int id)
         {
             using var connection = new SqlConnection(_connectionString);

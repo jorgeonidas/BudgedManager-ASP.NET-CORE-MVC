@@ -1,4 +1,56 @@
-﻿@{
+﻿@model MonthlyReportViewModel
+@{
     ViewData["Title"] = "Monthly Report";
+    int previousYear = Model.Year - 1;
+    int nextYear = Model.Year + 1;
+    var amountSummary = new AmountsSummaryViewModel
+    {
+        Expenses = Model.Expenses,
+        Income = Model.Income,
+        Total = Model.Total
+    };
 }
 <partial name="_SubMenu" Model="TransactionsSubMenu.Monthly" />
+<h4>
+    Displayin transactions from
+    <a asp-route-year="@previousYear" class="btn btn-secondary">
+        <i class="bi-chevron-left"></i>
+    </a>@Model.Year
+    <a asp-route-year="@nextYear" class="btn btn-secondary">
+        <i class="bi-chevron-right"></i>
+    </a>
+</h4>
+<partial name="_AmountsSummary" model="@amountSummary" />
+<table class="table" style="font-size: 20px">
+    <thead>
+        <tr style="background-color: lightblue">
+            <th>
+                Month
+            </th>
+            <th style="text-align: right">
+                Income
+            </th>
+            <th style="text-align: right">
+                Expenses
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var transaction in Model.MonthlyTransactions)
+        {
+            <tr>
+                <td>
+                    <a style="text-decoration: none;" asp-action="Index" asp-route-year="@Model.Year" asp-route-month="@transaction.Month">
+                        @transaction.ReferenceDate.ToString("MMM")
+                    </a>
+                </td>
+                <td class="active-balance" style="text-align: right">
+                    @transaction.Income
+                </td>
+                <td class="passive-balance" style="text-align: right">
+                    @transaction.Expense
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
