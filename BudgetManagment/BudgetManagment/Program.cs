@@ -15,6 +15,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IReportsService, ReportsService>();
 builder.Services.AddTransient<IRepositoryUsers, RepositoryUsers>();
 builder.Services.AddTransient<IUserStore<User>, UserStore>();
+builder.Services.AddTransient<SignInManager<User>>();
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<AutoMapperProfile>();
@@ -26,6 +27,13 @@ builder.Services.AddIdentityCore<User>(options =>
     options.Password.RequireLowercase = false;
     options.Password.RequireDigit = false;
 });
+//setup cookie authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultSignOutScheme = IdentityConstants.ApplicationScheme;
+}).AddCookie(IdentityConstants.ApplicationScheme);
 
 var app = builder.Build();
 
@@ -40,6 +48,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
