@@ -1,11 +1,21 @@
 using BudgetManagment.Models;
 using BudgetManagment.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+var authenticatedUsersPolicy = new AuthorizationPolicyBuilder()
+    .RequireAuthenticatedUser()
+    .Build();
+//all the controllers and actions will require authenticated users unless [AllowAnonymous] is used
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add(new AuthorizeFilter(authenticatedUsersPolicy));
+});
 builder.Services.AddTransient<IRepositoryAccountTypes, RepositoryAccountTypes>();
 builder.Services.AddTransient<IUsersService, UsersService>();
 builder.Services.AddTransient<IRepositoryAccounts, RepositoryAccounts>();
@@ -33,7 +43,10 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
     options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
     options.DefaultSignOutScheme = IdentityConstants.ApplicationScheme;
-}).AddCookie(IdentityConstants.ApplicationScheme);
+}).AddCookie(IdentityConstants.ApplicationScheme, options =>
+{
+    options.LoginPath ="/Users/Login";
+});
 
 var app = builder.Build();
 
