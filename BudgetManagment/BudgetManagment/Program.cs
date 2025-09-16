@@ -1,4 +1,6 @@
+using BudgetManagment.Models;
 using BudgetManagment.Services;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,9 +13,18 @@ builder.Services.AddTransient<IRepositoryCategories, RepositoryCategories>();
 builder.Services.AddTransient<IRepositoryTransactions, RepositoryTransactions>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IReportsService, ReportsService>();
+builder.Services.AddTransient<IRepositoryUsers, RepositoryUsers>();
+builder.Services.AddTransient<IUserStore<User>, UserStore>();
 builder.Services.AddAutoMapper(cfg =>
 {
-    cfg.AddProfile<BudgetManagment.Services.AutoMapperProfile>();
+    cfg.AddProfile<AutoMapperProfile>();
+});
+builder.Services.AddIdentityCore<User>(options =>
+{
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireDigit = false;
 });
 
 var app = builder.Build();

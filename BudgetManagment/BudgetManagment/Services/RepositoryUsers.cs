@@ -1,0 +1,35 @@
+﻿using BudgetManagment.Models;
+using Dapper;
+using Microsoft.Data.SqlClient;
+
+namespace BudgetManagment.Services
+{
+    public class RepositoryUsers : IRepositoryUsers
+    {
+        private readonly string _connectionString;
+        public RepositoryUsers(IConfiguration configuration)
+        {
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
+        }
+
+        public async Task<int> CreateUser(User user)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            var id = await connection.QuerySingleAsync<int>(@"INSERT INTO Users (Email, NormalizedEmail, PasswordHash) 
+                                                            VALUES (@Email, @NormalizedEmail, @PasswordHash)
+                                                            SELECT SCOPE_IDENTITY();",
+                                                            new { user.Email, user.NormalizedEmail, user.PasswordHash }
+            );
+            return id;
+        }
+
+        public async Task<User> GetUserByEmail(string normalizedEmail)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.QuerySingleOrDefaultAsync<User>(
+                @"SELECT * FROM Users WHERE NormalizedEmail = @NormalizedEmail", 
+                new { normalizedEmail }
+            );
+        }
+    }
+}
