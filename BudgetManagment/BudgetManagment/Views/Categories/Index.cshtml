@@ -4,8 +4,19 @@
 }
 <h1>Categories</h1>
 <h5>The categories allow us to indicate how we spend our money, as well as where our income comes from.</h5>
-<h3>Categories Amount: @Model.TotalRecords - Pages Amount: @Model.TotalPagesAmount </h3>
 <a asp-action="Create" class="btn btn-primary mb-3">Create new</a>
+
+<div class="row">
+    <label>Amount of register to display</label>
+    <div class="mb-3 col-auto">
+        <select asp-for="@Model.RecordsPerPage" id="recordsPerPageAmount" class="form-select">
+            <option>3</option>
+            <option>5</option>
+            <option>10</option>
+        </select>
+    </div>
+</div>
+
 <partial name="_Pagination" />
 <table class="table">
     <thead>
@@ -34,3 +45,12 @@
         }
     </tbody>
 </table>
+
+@section Scripts{
+    <script>
+        $("#recordsPerPageAmount").change(function () {
+            const recordsPerPage = $(this).val();//selected value in the element
+            location.href = `/categories/?page=1&RecordsPerPage=${recordsPerPage}`;
+        });
+    </script>
+}
