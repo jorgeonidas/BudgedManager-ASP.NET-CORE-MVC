@@ -26,7 +26,7 @@ namespace BudgetManagment.Controllers
                 Page = pagination.Page,
                 RecordsPerPage = pagination.RecordsPerPage,
                 TotalRecords = totalCategories,
-                BaseUrl = "/categories"
+                BaseUrl = Url.Action()
             };
             return View(responseViewModel);
         }

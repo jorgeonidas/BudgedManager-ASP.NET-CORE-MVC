@@ -415,7 +415,12 @@ namespace BudgetManagment.Controllers
             OperationType operationType)
         {
             var categories = await _repositoryCategories.Get(userId, operationType);
-            return categories.Select(x => new SelectListItem(x.Name, x.Id.ToString()));
+            var result = categories.
+                Select(x => new SelectListItem(x.Name, x.Id.ToString()))
+                .ToList();
+            var defaultOption = new SelectListItem("-- Select A Category --", "0", true);
+            result.Insert(0, defaultOption);
+            return result;
         }
 
         [HttpPost]

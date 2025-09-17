@@ -58,10 +58,10 @@ namespace BudgetManagment.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> VerifyExistingAccountType(string name)
+        public async Task<IActionResult> VerifyExistingAccountType(string name, int id)
         {
             var userId = _usersService.GetUserId();
-            var alreadyExistAccountType = await _repositoryAccountTypes.Exist(name, userId);
+            var alreadyExistAccountType = await _repositoryAccountTypes.Exist(name, userId, id);
             if (alreadyExistAccountType)
             {
                 return Json($"El nombre {name} already exist");

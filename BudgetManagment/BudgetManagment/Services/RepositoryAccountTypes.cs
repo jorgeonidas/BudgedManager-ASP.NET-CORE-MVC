@@ -22,15 +22,15 @@ namespace BudgetManagment.Services
             accountType.Id = id;
         }
 
-        public async Task<bool> Exist(string name, int userId)
+        public async Task<bool> Exist(string name, int userId, int id = 0)
         {
             using var connection = new SqlConnection(_connectionString);
             //default int value is 0
             //query returns 1 if the data exist
             var exist = await connection.QueryFirstOrDefaultAsync<int>(@"SELECT 1 
                                                 FROM AccountTypes 
-                                                WHERE Name = @Name AND UserId = @UserId;",
-                                                new { name, userId });
+                                                WHERE Name = @Name AND UserId = @UserId AND Id <> @id;",
+                                                new { name, userId, id });
             return exist == 1;
         }
 
