@@ -306,7 +306,7 @@ namespace BudgetManagment.Controllers
                 return RedirectToAction("NotFound", "Home");
             }
             //validate category
-            var category = await _repositoryCategories.GetById(model.AccountId, userId);
+            var category = await _repositoryCategories.GetById(model.CategoryId, userId);
             if (category is null)
             {
                 return RedirectToAction("NotFound", "Home");

@@ -15,12 +15,15 @@ namespace BudgetManagment.Services
         public async Task<int> CreateUser(User user)
         {
             using var connection = new SqlConnection(_connectionString);
-            var id = await connection.QuerySingleAsync<int>(@"INSERT INTO Users (Email, NormalizedEmail, PasswordHash) 
+            var userId = await connection.QuerySingleAsync<int>(@"INSERT INTO Users (Email, NormalizedEmail, PasswordHash) 
                                                             VALUES (@Email, @NormalizedEmail, @PasswordHash)
                                                             SELECT SCOPE_IDENTITY();",
                                                             new { user.Email, user.NormalizedEmail, user.PasswordHash }
             );
-            return id;
+
+            await connection.ExecuteAsync("CreateNewUserData", new { userId }, commandType: System.Data.CommandType.StoredProcedure );
+
+            return userId;
         }
 
         public async Task<User> GetUserByEmail(string normalizedEmail)
