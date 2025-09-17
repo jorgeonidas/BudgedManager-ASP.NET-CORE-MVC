@@ -15,11 +15,20 @@ namespace BudgetManagment.Controllers
             this._usersService = usersService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(PaginationViewModel pagination)
         {
             var userId = _usersService.GetUserId();
-            var categories = await _repositoryCategories.Get(userId);
-            return View(categories);
+            var categories = await _repositoryCategories.Get(userId, pagination);
+            var totalCategories = await _repositoryCategories.Count(userId);
+            var responseViewModel = new PaginationResponse<Category>
+            {
+                Elements = categories,
+                Page = pagination.Page,
+                RecordsPerPage = pagination.RecordsPerPage,
+                TotalRecords = totalCategories,
+                BaseUrl = "/categories"
+            };
+            return View(responseViewModel);
         }
 
         [HttpGet]

@@ -23,11 +23,30 @@ namespace BudgetManagment.Services
             category.Id = id;
         }
 
-        public async Task<IEnumerable<Category>> Get(int userId)
+        public async Task<IEnumerable<Category>> Get(int userId, PaginationViewModel pagination)
         {
             using var connection = new SqlConnection(_connectionString);
-            return await connection.QueryAsync<Category>(@"SELECT * FROM Categories WHERE UserId = @userId", new { userId });
+            return await connection.QueryAsync<Category>(
+                @$"SELECT * 
+                FROM Categories 
+                WHERE UserId = @userId
+                ORDER BY Name
+                OFFSET {pagination.RecordsToJump} 
+                ROWS FETCH NEXT {pagination.RecordsPerPage}
+                ROWS ONLY", 
+                new { userId });
         }
+
+        public async Task<int> Count(int userId)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            return await connection.ExecuteScalarAsync<int>(
+                @"SELECT COUNT(*) 
+                FROM Categories 
+                WHERE UserId = @userId", 
+                new { userId });
+        }
+
         public async Task<IEnumerable<Category>> Get(int userId, OperationType operationTypeId)
         {
             using var connection = new SqlConnection(_connectionString);
