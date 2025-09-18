@@ -36,7 +36,7 @@ builder.Services.AddIdentityCore<User>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireLowercase = false;
     options.Password.RequireDigit = false;
-});
+}).AddDefaultTokenProviders();// we will use it for email confirmation and password reset
 //setup cookie authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -47,6 +47,8 @@ builder.Services.AddAuthentication(options =>
 {
     options.LoginPath ="/Users/Login";
 });
+
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 var app = builder.Build();
 

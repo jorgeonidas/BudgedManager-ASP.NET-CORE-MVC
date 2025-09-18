@@ -34,5 +34,14 @@ namespace BudgetManagment.Services
                 new { normalizedEmail }
             );
         }
+
+        public async Task UpdateUserPassword(User user)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.ExecuteAsync(
+                @"UPDATE Users SET PasswordHash = @PasswordHash WHERE Id = @Id",
+                new { user.PasswordHash, user.Id }
+            );
+        }
     }
 }

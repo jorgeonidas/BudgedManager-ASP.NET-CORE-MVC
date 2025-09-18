@@ -6,5 +6,6 @@ namespace BudgetManagment.Services
     {
         Task<int> CreateUser(User user);
         Task<User> GetUserByEmail(string normalizedEmail);
+        Task UpdateUserPassword(User user);
     }
 }
